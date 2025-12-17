@@ -12,6 +12,7 @@ const Lead = new mongoose.Schema({
   phone: {
     type: Number,
     required: true,
+    unique:true
   },
   company: {
     type: String,
