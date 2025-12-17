@@ -53,6 +53,7 @@ route.post("/auth/login", async (req, res) => {
     res.cookie("lmstoken", token, {
       httpOnly: true, // Prevent access to the cookie from JavaScript
       secure: process.env.NODE_ENV === "production", // Set 'secure' to true in production for HTTPS
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
 
     res.json({ msg: "login successfull", data: user });
