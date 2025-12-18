@@ -97,6 +97,41 @@ route.put("/updateLead", async (req, res) => {
   }
 });
 
+route.put("/updateLeadEmp", async (req, res) => {
+  try {
+    const {
+      name,
+      company,
+      email,
+      phone,
+      source,
+      status,
+      leadValue,
+    } = req.body;
+    const num = Number(phone);
+    const update = await Lead.updateOne(
+      { phone: phone },
+      {
+        $set: {
+          name: name,
+          email: email,
+          phone: num,
+          company: company,
+          source: source,
+          status: status,
+          value: leadValue,
+        },
+      }
+    );
+    if (!update) {
+      res.status(500).json({ msg: "server error" });
+    }
+    res.status(201).json({ msg: "lead is updated" });
+  } catch (error) {
+    console.log(error)
+  }
+});
+
 route.delete('/deleteLead/:id',async(req,res)=>{
  try {
   const {id} = req.params;
@@ -106,6 +141,20 @@ route.delete('/deleteLead/:id',async(req,res)=>{
     res.status(500).json({'msg':'server error'})
   }
   res.status(201).json({'msg':'lead is removed'})
+ } catch (error) {
+  console.log(error)
+ }
+})
+
+route.get('/getAllLeadEmp/:id',async(req,res)=>{
+ try {
+   const {id} = req.params;
+  const ph = Number(id)
+  const data = await Lead.find({assigned_to:ph})
+  if(!data){
+    res.status(500).json({'msg':'server error'})
+  }
+  res.status(200).json({'msg':'all employees lead','data':data})
  } catch (error) {
   console.log(error)
  }

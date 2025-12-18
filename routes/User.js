@@ -116,7 +116,6 @@ route.get("/getusers", verifyToken, async (req, res) => {
         },
       },
 
-      { $unwind: { path: "$leads", preserveNullAndEmptyArrays: true } },
     ]);
     if (!userData) {
       return res.status(500).json({ msg: "server error" });
