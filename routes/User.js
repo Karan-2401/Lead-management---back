@@ -31,7 +31,7 @@ route.post("/auth/login", async (req, res, next) => {
     ]);
     if (user.length === 0) {
       return res.status(400).json({
-        msg: "No User with this email",statusCode:404
+        msg: "No User with this email",statusCode:404,Heading:'No User'
       });
     }
 
@@ -43,7 +43,7 @@ route.post("/auth/login", async (req, res, next) => {
     }
     const auth = await Data.comparePassword(password);
     if (!auth) {
-      res.status(401).json({ msg: "Unauthentication error may be your password is wrong",statusCode:401 });
+      res.status(401).json({ msg: "Unauthentication error may be your password is wrong",statusCode:401,Heading:'Password incorrect' });
     } else {
       const token = jwt.sign({ userId: user.phone }, process.env.JWT_SECRET, {
         expiresIn: "1h",
@@ -55,7 +55,7 @@ route.post("/auth/login", async (req, res, next) => {
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       });
 
-      res.json({ msg: "login successfull", data: user,statusCode:200,statusText:'Login Successfull' });
+      res.json({ msg: "login successfull", data: user,statusCode:200,Heading:'Login Successfull' });
     }
   } catch (error) {
     console.log(error);
