@@ -5,7 +5,7 @@ const Profile = require("../models/Profile");
 const jwt = require("jsonwebtoken");
 const verifyToken = require("../middleware/auth.middleware");
 
-route.post("/auth/login", async (req, res) => {
+route.post("/auth/login", async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -13,6 +13,7 @@ route.post("/auth/login", async (req, res) => {
         msg: "All fields are required",
       });
     }
+
     // const user = await User.findOne({ email: email });
     const user = await User.aggregate([
       {
@@ -30,7 +31,7 @@ route.post("/auth/login", async (req, res) => {
     ]);
     if (user.length === 0) {
       return res.status(400).json({
-        msg: "No User with this email",
+        msg: "No User with this email",statusCode:404
       });
     }
 
@@ -40,25 +41,25 @@ route.post("/auth/login", async (req, res) => {
         msg: "Password comparison method is not available",
       });
     }
-
-    const auth = Data.comparePassword(password);
+    const auth = await Data.comparePassword(password);
     if (!auth) {
-      res.status(400).json({ msg: "The password is incorrect" });
+      res.status(401).json({ msg: "Unauthentication error may be your password is wrong",statusCode:401 });
+    } else {
+      const token = jwt.sign({ userId: user.phone }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+
+      res.cookie("lmstoken", token, {
+        httpOnly: true, // Prevent access to the cookie from JavaScript
+        secure: process.env.NODE_ENV === "production", // Set 'secure' to true in production for HTTPS
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      });
+
+      res.json({ msg: "login successfull", data: user,statusCode:200,statusText:'Login Successfull' });
     }
-
-    const token = jwt.sign({ userId: user.phone }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-
-    res.cookie("lmstoken", token, {
-      httpOnly: true, // Prevent access to the cookie from JavaScript
-      secure: process.env.NODE_ENV === "production", // Set 'secure' to true in production for HTTPS
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    });
-
-    res.json({ msg: "login successfull", data: user });
   } catch (error) {
     console.log(error);
+    next(error)
   }
 });
 
@@ -115,7 +116,6 @@ route.get("/getusers", verifyToken, async (req, res) => {
           as: "leads",
         },
       },
-
     ]);
     if (!userData) {
       return res.status(500).json({ msg: "server error" });
@@ -140,7 +140,7 @@ route.patch("/updateUser", async (req, res) => {
           name: name,
           email: email,
         },
-      }
+      },
     );
 
     if (!user) {
@@ -153,7 +153,7 @@ route.patch("/updateUser", async (req, res) => {
         $set: {
           role: role,
         },
-      }
+      },
     );
 
     if (!profile) {
@@ -162,14 +162,14 @@ route.patch("/updateUser", async (req, res) => {
 
     res.status(201).json({ msg: "User is Update" });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 });
 
 route.delete("/deleteUser/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const number = Number(id)
+    const number = Number(id);
     const user = await User.findOne({ phone: number });
     if (!user) {
       return res.status(404).json({ msg: "User not found" });

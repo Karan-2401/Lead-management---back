@@ -36,7 +36,7 @@ route.post("/add", verifyToken, async (req, res) => {
   }
 });
 
-route.get("/getAllLeads", verifyToken, async (req, res) => {
+route.get("/getAllLeads", verifyToken, async (req, res, next) => {
   try {
     const Leads = await Lead.aggregate([
       {
@@ -57,6 +57,7 @@ route.get("/getAllLeads", verifyToken, async (req, res) => {
     res.status(200).json({ msg: "Data", data: Leads });
   } catch (error) {
     console.log(error);
+    next(error)
   }
 });
 
