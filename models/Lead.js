@@ -33,6 +33,10 @@ const Lead = new mongoose.Schema({
   value:{
     type: Number,
     required: true,
+  },
+  company_id:{
+    type:String,
+    required:true
   }
 },{timestamps:true});
 

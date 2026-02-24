@@ -68,7 +68,7 @@ route.post("/createuser", verifyToken, async (req, res) => {
     const { name, email, phone, role, password } = req.body;
     if (!name || !email || !phone || !role || !password) {
       return res.status(400).json({
-        msg: "all fields are required.",
+        msg: "all fields are required.",statusCode:400,Heading:'Fields Required'
       });
     }
     const userData = await User.insertOne({
@@ -86,9 +86,10 @@ route.post("/createuser", verifyToken, async (req, res) => {
     if ((userData, userProfile)) {
       return res.status(201).json({
         msg: "user is created",
+        statusCode:201,Heading:'User Created'
       });
     }
-    res.status(500).json({ msg: "server error" });
+    res.status(500).json({ msg: "server error",statusCode:500,Heading:'Server Error' });
   } catch (error) {
     console.log(error);
   }
@@ -118,11 +119,13 @@ route.get("/getusers", verifyToken, async (req, res) => {
       },
     ]);
     if (!userData) {
-      return res.status(500).json({ msg: "server error" });
+      return res.status(500).json({ msg: "There is no user.",statusCode:204,Heading:'No User' });
     }
     res.status(200).json({
-      msg: "get data",
+      msg: "User List",
       userData,
+      statusCode:200,
+      Heading:'User List'
     });
   } catch (error) {
     console.log(error);

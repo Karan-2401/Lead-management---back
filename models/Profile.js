@@ -14,7 +14,7 @@ const Profile = new mongoose.Schema({
     type:Boolean,
     required:false,
     default:true
-  }
+  },
 },{timestamps:true});
 
 module.exports = mongoose.model('Profile',Profile)

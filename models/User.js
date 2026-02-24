@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
 const User = new mongoose.Schema(
   {
     name: {
@@ -16,32 +16,29 @@ const User = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    password:{
-       type: String,
+    password: {
+      type: String,
       required: true,
-    }
+    },
+    company_id: {
+      type: String,
+      required: true,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
-
 
 User.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-User.post("deleteOne", {document: true, query: true }, async function () {
+User.post("deleteOne", { document: true, query: true }, async function () {
   try {
-    await mongoose
-      .model("Profile")
-      .deleteOne({ user_id: this.phone });
+    await mongoose.model("Profile").deleteOne({ user_id: this.phone });
 
     await mongoose
       .model("Lead")
-      .updateMany(
-        { assigned_to: this.phone },
-        { $set: { assigned_to: null } }
-      );
-
+      .updateMany({ assigned_to: this.phone }, { $set: { assigned_to: null } });
   } catch (err) {
     console.error(err);
   }

@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const app = express();
 const User = require('./routes/User')
 const Lead = require('./routes/Lead')
+const Company = require('./routes/Company')
 const connectDB = require('./config/db-connection')
 const cors = require('cors');
 const morgan = require('morgan');
@@ -20,12 +21,14 @@ app.use(
 )
 app.use(morgan('combined'))
 app.use(cookieParser()); 
+app.use("/uploads", express.static("uploads"));
 // database connection
 connectDB()
 
 // routes
 app.use('/',User)
 app.use('/lead',Lead)
+app.use('/company',Company)
 
 // 404 handler
 app.use((req, res, next) => {
