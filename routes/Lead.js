@@ -36,9 +36,16 @@ route.post("/add", verifyToken, async (req, res) => {
   }
 });
 
-route.get("/getAllLeads", verifyToken, async (req, res, next) => {
+route.get("/getAllLeads/:id", verifyToken, async (req, res, next) => {
   try {
+    const id = req.params.id;
     const Leads = await Lead.aggregate([
+      {
+        $match: {
+          company_id: id, // adjust if string
+        },
+      },
+
       {
         $lookup: {
           from: "users",
@@ -57,7 +64,7 @@ route.get("/getAllLeads", verifyToken, async (req, res, next) => {
     res.status(200).json({ msg: "Data", data: Leads });
   } catch (error) {
     console.log(error);
-    next(error)
+    next(error);
   }
 });
 
@@ -87,28 +94,20 @@ route.put("/updateLead", async (req, res) => {
           status: status,
           value: leadValue,
         },
-      }
+      },
     );
     if (!update) {
       res.status(500).json({ msg: "server error" });
     }
     res.status(201).json({ msg: "lead is updated" });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 });
 
 route.put("/updateLeadEmp", async (req, res) => {
   try {
-    const {
-      name,
-      company,
-      email,
-      phone,
-      source,
-      status,
-      leadValue,
-    } = req.body;
+    const { name, company, email, phone, source, status, leadValue } = req.body;
     const num = Number(phone);
     const update = await Lead.updateOne(
       { phone: phone },
@@ -122,43 +121,43 @@ route.put("/updateLeadEmp", async (req, res) => {
           status: status,
           value: leadValue,
         },
-      }
+      },
     );
     if (!update) {
       res.status(500).json({ msg: "server error" });
     }
     res.status(201).json({ msg: "lead is updated" });
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 });
 
-route.delete('/deleteLead/:id',async(req,res)=>{
- try {
-  const {id} = req.params;
-  const ph = Number(id)
-  const deleteLead = await Lead.findOneAndDelete({phone:ph})
-  if(!deleteLead){
-    res.status(500).json({'msg':'server error'})
+route.delete("/deleteLead/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const ph = Number(id);
+    const deleteLead = await Lead.findOneAndDelete({ phone: ph });
+    if (!deleteLead) {
+      res.status(500).json({ msg: "server error" });
+    }
+    res.status(201).json({ msg: "lead is removed" });
+  } catch (error) {
+    console.log(error);
   }
-  res.status(201).json({'msg':'lead is removed'})
- } catch (error) {
-  console.log(error)
- }
-})
+});
 
-route.get('/getAllLeadEmp/:id',async(req,res)=>{
- try {
-   const {id} = req.params;
-  const ph = Number(id)
-  const data = await Lead.find({assigned_to:ph})
-  if(!data){
-    res.status(500).json({'msg':'server error'})
+route.get("/getAllLeadEmp/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const ph = Number(id);
+    const data = await Lead.find({ assigned_to: ph });
+    if (!data) {
+      res.status(500).json({ msg: "server error" });
+    }
+    res.status(200).json({ msg: "all employees lead", data: data });
+  } catch (error) {
+    console.log(error);
   }
-  res.status(200).json({'msg':'all employees lead','data':data})
- } catch (error) {
-  console.log(error)
- }
-})
+});
 
 module.exports = route;

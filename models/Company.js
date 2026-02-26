@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const Company = new mongoose.Schema({
+    _id: String,
     name:{
         type:String,
         required:true

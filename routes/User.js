@@ -27,11 +27,22 @@ route.post("/auth/login", async (req, res, next) => {
           as: "profile",
         },
       },
+      {
+        $lookup: {
+          from: "companies",
+          localField: "company_id",
+          foreignField: "_id",
+          as: "company",
+        },
+      },
       { $unwind: "$profile" },
+      { $unwind: "$company" },
     ]);
     if (user.length === 0) {
       return res.status(400).json({
-        msg: "No User with this email",statusCode:404,Heading:'No User'
+        msg: "No User with this email",
+        statusCode: 404,
+        Heading: "No User",
       });
     }
 
@@ -43,7 +54,13 @@ route.post("/auth/login", async (req, res, next) => {
     }
     const auth = await Data.comparePassword(password);
     if (!auth) {
-      res.status(401).json({ msg: "Unauthentication error may be your password is wrong",statusCode:401,Heading:'Password incorrect' });
+      res
+        .status(401)
+        .json({
+          msg: "Unauthentication error may be your password is wrong",
+          statusCode: 401,
+          Heading: "Password incorrect",
+        });
     } else {
       const token = jwt.sign({ userId: user.phone }, process.env.JWT_SECRET, {
         expiresIn: "1h",
@@ -55,11 +72,16 @@ route.post("/auth/login", async (req, res, next) => {
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       });
 
-      res.json({ msg: "login successfull", data: user,statusCode:200,Heading:'Login Successfull' });
+      res.json({
+        msg: "login successfull",
+        data: user,
+        statusCode: 200,
+        Heading: "Login Successfull",
+      });
     }
   } catch (error) {
     console.log(error);
-    next(error)
+    next(error);
   }
 });
 
@@ -68,7 +90,9 @@ route.post("/createuser", verifyToken, async (req, res) => {
     const { name, email, phone, role, password } = req.body;
     if (!name || !email || !phone || !role || !password) {
       return res.status(400).json({
-        msg: "all fields are required.",statusCode:400,Heading:'Fields Required'
+        msg: "all fields are required.",
+        statusCode: 400,
+        Heading: "Fields Required",
       });
     }
     const userData = await User.insertOne({
@@ -86,10 +110,13 @@ route.post("/createuser", verifyToken, async (req, res) => {
     if ((userData, userProfile)) {
       return res.status(201).json({
         msg: "user is created",
-        statusCode:201,Heading:'User Created'
+        statusCode: 201,
+        Heading: "User Created",
       });
     }
-    res.status(500).json({ msg: "server error",statusCode:500,Heading:'Server Error' });
+    res
+      .status(500)
+      .json({ msg: "server error", statusCode: 500, Heading: "Server Error" });
   } catch (error) {
     console.log(error);
   }
@@ -119,13 +146,19 @@ route.get("/getusers", verifyToken, async (req, res) => {
       },
     ]);
     if (!userData) {
-      return res.status(500).json({ msg: "There is no user.",statusCode:204,Heading:'No User' });
+      return res
+        .status(500)
+        .json({
+          msg: "There is no user.",
+          statusCode: 204,
+          Heading: "No User",
+        });
     }
     res.status(200).json({
       msg: "User List",
       userData,
-      statusCode:200,
-      Heading:'User List'
+      statusCode: 200,
+      Heading: "User List",
     });
   } catch (error) {
     console.log(error);

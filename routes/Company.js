@@ -3,14 +3,15 @@ const router = express.Router();
 const imageUploader = require("../middleware/imageUploader");
 const verifyToken = require("../middleware/auth.middleware");
 const Company = require("../models/Company");
+const randomNumberGenerator = require('../functions/randomNumberGenerator');
 
 router.post(
   "/createCompany",
-  verifyToken,
   imageUploader.single("image"),
   async (req, res) => {
     try {
-      const { filename } = req.file;
+      const randomCode = randomNumberGenerator(9,0,9);
+      console.log(randomCode)
       const {
         companyName,
         email,
@@ -21,8 +22,10 @@ router.post(
         state,
         zipCode,
       } = req.body;
+      const {filename} = req.file
 
       const company = new Company({
+        _id:companyName+phone+randomCode,  
         name: companyName,
         email: email,
         phone: phone,
@@ -31,7 +34,7 @@ router.post(
         city: city,
         state: state,
         zipcode: zipCode,
-        image: filename ? filename : null,
+        image:filename ? filename : null,
       });
       
       const info = await company.save();

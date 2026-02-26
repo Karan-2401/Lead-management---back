@@ -22,7 +22,7 @@ const User = new mongoose.Schema(
     },
     company_id: {
       type: String,
-      required: true,
+      ref: "Company",
     },
   },
   { timestamps: true },
