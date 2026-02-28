@@ -42,7 +42,7 @@ route.get("/getAllLeads/:id", verifyToken, async (req, res, next) => {
     const Leads = await Lead.aggregate([
       {
         $match: {
-          company_id: id, // adjust if string
+          company_id: id,
         },
       },
 

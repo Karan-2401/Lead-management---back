@@ -87,8 +87,8 @@ route.post("/auth/login", async (req, res, next) => {
 
 route.post("/createuser", verifyToken, async (req, res) => {
   try {
-    const { name, email, phone, role, password } = req.body;
-    if (!name || !email || !phone || !role || !password) {
+    const { name, email, phone, role, password,company_id } = req.body;
+    if (!name || !email || !phone || !role || !password || !company_id) {
       return res.status(400).json({
         msg: "all fields are required.",
         statusCode: 400,
@@ -100,6 +100,7 @@ route.post("/createuser", verifyToken, async (req, res) => {
       phone: phone,
       email: email,
       password: password,
+      company_id: company_id,
     });
 
     const userProfile = await Profile.insertOne({
@@ -122,9 +123,15 @@ route.post("/createuser", verifyToken, async (req, res) => {
   }
 });
 
-route.get("/getusers", verifyToken, async (req, res) => {
+route.get("/getusers/:id", verifyToken, async (req, res) => {
   try {
+    const id = req.params.id
     const userData = await User.aggregate([
+       {
+        $match: {
+          company_id: id,
+        },
+      },
       {
         $lookup: {
           from: "profiles",
