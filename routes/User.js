@@ -187,7 +187,8 @@ route.patch("/updateUser", async (req, res) => {
     );
 
     if (!user) {
-      res.status(500).json({ msg: "server error" });
+      res.status(404).json({  statusCode: 404,
+          Heading: "User Not Found",msg:"user is not found" });
     }
 
     const profile = await Profile.updateOne(
@@ -200,10 +201,12 @@ route.patch("/updateUser", async (req, res) => {
     );
 
     if (!profile) {
-      res.status(500).json({ msg: "server error" });
+      res.status(404).json({ msg: "Profile Not Found", statusCode: 404,
+          Heading: "No User", });
     }
 
-    res.status(201).json({ msg: "User is Update" });
+    res.status(201).json({ msg: "User is Update", statusCode: 200,
+          Heading: "User Updated", });
   } catch (error) {
     console.log(error);
   }
@@ -215,7 +218,8 @@ route.delete("/deleteUser/:id", async (req, res) => {
     const number = Number(id);
     const user = await User.findOne({ phone: number });
     if (!user) {
-      return res.status(404).json({ msg: "User not found" });
+      return res.status(404).json({ msg: "User not found", statusCode: 404,
+          Heading: "No User",});
     }
 
     await user.deleteOne();
