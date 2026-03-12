@@ -14,7 +14,9 @@ route.post("/add", verifyToken, async (req, res) => {
       status,
       assignTo,
       leadValue,
+      company_id
     } = req.body;
+    console.log(req.body)
     const phone2 = Number(phone);
     const value = Number(leadValue);
     const lead = await Lead.insertOne({
@@ -26,12 +28,13 @@ route.post("/add", verifyToken, async (req, res) => {
       assigned_to: assignTo,
       status: status,
       value: value,
+      company_id:company_id
     });
     if (!lead) {
       res.status(500).json({ msg: "server error", statusCode: 500,
           Heading: "Server Error", });
     }
-    res.status(201).json({ msg: "Lead is created", statusCode: 200,
+    res.status(201).json({ msg: "Lead is created", statusCode: 201,
           Heading: "Lead Created", });
   } catch (error) {
     console.log(error);

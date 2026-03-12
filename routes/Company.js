@@ -5,6 +5,7 @@ const verifyToken = require("../middleware/auth.middleware");
 const Company = require("../models/Company");
 const randomNumberGenerator = require('../functions/randomNumberGenerator');
 
+// update company
 router.post(
   "/createCompany",
   imageUploader.single("image"),
@@ -47,5 +48,6 @@ router.post(
     }
   },
 );
+
 
 module.exports = router;
