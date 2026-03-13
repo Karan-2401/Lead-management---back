@@ -224,7 +224,8 @@ route.delete("/deleteUser/:id", async (req, res) => {
 
     await user.deleteOne();
 
-    res.json({ msg: "User deleted successfully" });
+    res.json({ msg: "User deleted successfully",statusCode: 200,
+          Heading: "User Deleted", });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
