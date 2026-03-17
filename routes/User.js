@@ -172,7 +172,7 @@ route.get("/getusers/:id", verifyToken, async (req, res) => {
   }
 });
 
-route.patch("/updateUser", async (req, res) => {
+route.patch("/updateUser", verifyToken, async (req, res) => {
   try {
     const { name, email, phone, role } = req.body;
 
@@ -211,6 +211,70 @@ route.patch("/updateUser", async (req, res) => {
     console.log(error);
   }
 });
+
+route.patch('/updateProfile/:id',verifyToken,async(req,res)=>{
+  try {
+    const {id}= req.params;
+    const {email,name} = req.body;
+    const user = await User.updateOne(
+      { phone: id },
+      {
+        $set: {
+          name: name,
+          email: email,
+        },
+      },
+    );
+
+    if (!user) {
+      res.status(404).json({  statusCode: 404,
+          Heading: "User Not Found",msg:"user is not found" });
+    }
+    res.status(200).json({ msg: "Profile is updated", statusCode: 200,
+          Heading: "Profile Updated", });
+
+  } catch (error) {
+    console.log(error);
+  }
+
+});
+
+route.patch('/updateProfilePassword/:id',verifyToken, async (req,res)=>{
+  try {
+    const {id} = req.params;
+    const {current_password,new_password,confirm_password} = req.body;
+    if(!current_password || !new_password || !confirm_password){
+      return res.json({
+        msg: "you not filling the all inputs of the form", statusCode: 400,
+          Heading: "Bad Request",
+      })
+    }
+
+    const user = await User.findOne({phone:id})
+    if(!user){
+      return res.json({
+        msg: "there is no user with this phone number", statusCode: 400,
+          Heading: "Bad Request",
+      })
+    }
+
+    const Data = new User(user[0]);
+
+    const auth = await Data.comparePassword(current_password);
+    if (!auth) {
+      res
+        .status(401)
+        .json({
+          msg: "Unauthentication error may be your password is wrong",
+          statusCode: 401,
+          Heading: "Password incorrect",
+        });
+    }
+
+  } catch (error) {
+    console.log(error)
+  }
+})
 
 route.delete("/deleteUser/:id", async (req, res) => {
   try {
