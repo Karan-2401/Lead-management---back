@@ -9,7 +9,6 @@ const cors = require('cors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser')
 require('dotenv').config()
-console.log(process.env.frontURL)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true, limit: '10000mb' }));
 // cors setup
